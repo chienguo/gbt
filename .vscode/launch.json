@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'gbt'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=gbt",
+                    "--package=gbt"
+                ],
+                "filter": {
+                    "name": "gbt",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "decode",
+                "5:hello"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'gbt'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=gbt",
+                    "--package=gbt"
+                ],
+                "filter": {
+                    "name": "gbt",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
