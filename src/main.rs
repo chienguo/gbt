@@ -1,15 +1,30 @@
 use std::collections::HashMap;
-use std::env;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
+use std::path::PathBuf;
 
 use anyhow::Context;
 use anyhow::Result;
+use clap::Parser;
+use clap::Subcommand;
 use thiserror::Error;
 
 // Available if you need it!
 // use serde_bencode
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+  #[command(subcommand)]
+  command: Command,
+}
+
+#[derive(Subcommand, Debug)]
+enum Command {
+  Decode { value: String },
+  Info { torrent: PathBuf },
+}
 
 #[derive(Debug, PartialEq, Eq)]
 enum Bencode {
@@ -224,22 +239,20 @@ fn parse_dict(input: &[u8]) -> ParseResult<Bencode> {
 
 // Usage: your_program.sh decode "<encoded_value>"
 fn main() -> Result<()> {
-  let args: Vec<String> = env::args().collect();
-  let command = &args[1];
+  let args = Args::parse();
 
-  if command == "decode" {
-    let encoded_value = &args[2];
-    let decoded_value = parse_bencode(encoded_value.as_bytes()).unwrap();
-    println!("{decoded_value}");
-  } else if command == "info" {
-    let file_name = &args[2];
-    let mut file = File::open(file_name)?;
-    let mut data = vec![];
-    file.read_to_end(&mut data)?;
-    let value = parse_bencode(&data).unwrap();
-    println!("{value}");
-  } else {
-    println!("unknown command: {}", args[1])
+  match args.command {
+    Command::Decode { value } => {
+      let v = parse_bencode(value.as_bytes()).unwrap();
+      println!("{v}");
+    }
+    Command::Info { torrent } => {
+      let mut file = File::open(torrent)?;
+      let mut data = vec![];
+      file.read_to_end(&mut data)?;
+      let value = parse_bencode(&data).unwrap();
+      println!("{value}");
+    }
   }
 
   Ok(())
